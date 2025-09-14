@@ -1,12 +1,8 @@
 spring:
     application:
         name: flightsight-back
-    security:
-        user:
-            name: seb
-            password: seb123
     datasource:
-        url: jdbc:postgresql://host.docker.internal:5432/db_flightsight
+        url: jdbc:postgresql://localhost:5432/db_flightsight
         username: flightsight_user
         password: flightsight_password
     jpa:
@@ -15,4 +11,6 @@ spring:
         properties:
             hibernate:
                 dialect: org.hibernate.dialect.PostgreSQLDialect
-
+springdoc:
+  api-docs:
+    path: /flightsight-api-docs

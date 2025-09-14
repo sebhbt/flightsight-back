@@ -1,0 +1,110 @@
+package com.sbthbt.flightsight_back.controller;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.sbthbt.flightsight_back.db.entity.ReviewEntity;
+import com.sbthbt.flightsight_back.dto.ReviewDto;
+import com.sbthbt.flightsight_back.services.ReviewService;
+import com.sbthbt.flightsight_back.specification.ReviewSearchCriteria;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@RestController
+@RequestMapping("/api/reviews")
+@Tag(name = "Reviews", description = "API for managing flight reviews")
+public class ReviewController {
+
+    @Autowired
+    private ReviewService reviewService;
+
+    @PostMapping
+    @Operation(summary = "Create a new review", description = "Creates a new review for a flight")
+    @ApiResponse(responseCode = "201", description = "Review created successfully")
+    public ResponseEntity<ReviewEntity> createReview(@RequestBody ReviewDto reviewDto) {
+        ReviewEntity review = new ReviewEntity();
+        review.setFlightId(reviewDto.getFlightId());
+        review.setTitle(reviewDto.getTitle());
+        review.setComment(reviewDto.getContent());
+        review.setRating(reviewDto.getRating());
+        ReviewEntity createdReview = reviewService.createReview(review);
+        return ResponseEntity.status(201).body(createdReview);
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a review by ID", description = "Returns a review by its ID")
+    @ApiResponse(responseCode = "200", description = "Review found")
+    @ApiResponse(responseCode = "404", description = "Review not found")
+    public ResponseEntity<ReviewEntity> getReviewById(
+            @Parameter(description = "ID of the review") @PathVariable Long id) {
+        Optional<ReviewEntity> review = reviewService.getReviewById(id);
+        return review.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/flight/{flightId}")
+    @Operation(summary = "Get reviews by flight ID", description = "Returns all reviews for a specific flight")
+    @ApiResponse(responseCode = "200", description = "List of reviews for the flight")
+    public ResponseEntity<List<ReviewEntity>> getReviewsByFlightId(
+            @Parameter(description = "ID of the flight") @PathVariable Long flightId) {
+        List<ReviewEntity> reviews = reviewService.getReviewsByFlightId(flightId);
+        return ResponseEntity.ok(reviews);
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update a review", description = "Updates an existing review")
+    @ApiResponse(responseCode = "200", description = "Review updated successfully")
+    @ApiResponse(responseCode = "404", description = "Review not found")
+    public ResponseEntity<ReviewEntity> updateReview(
+            @Parameter(description = "ID of the review to update") @PathVariable Long id,
+            @RequestBody ReviewDto reviewDto) {
+        ReviewEntity reviewDetails = new ReviewEntity();
+        reviewDetails.setTitle(reviewDto.getTitle());
+        reviewDetails.setComment(reviewDto.getContent());
+        reviewDetails.setRating(reviewDto.getRating());
+        ReviewEntity updatedReview = reviewService.updateReview(id, reviewDetails);
+        return ResponseEntity.ok(updatedReview);
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete a review", description = "Deletes a review by its ID")
+    @ApiResponse(responseCode = "204", description = "Review deleted successfully")
+    public ResponseEntity<Void> deleteReview(
+            @Parameter(description = "ID of the review to delete") @PathVariable Long id) {
+        reviewService.deleteReview(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search reviews with pagination and filtering", description = """
+                Returns a paginated list of reviews matching the search criteria.
+                If no criteria are provided, returns all reviews sorted by creation date (descending).
+                Default pagination: 20 items per page.
+            """)
+    @ApiResponse(responseCode = "200", description = "Paginated list of reviews matching the criteria")
+    public Page<ReviewEntity> searchReviews(
+            @Parameter(description = "Search criteria for reviews (optional)") @ModelAttribute ReviewSearchCriteria criteria,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 20) Pageable pageable) {
+        return reviewService.searchReviews(criteria, pageable);
+    }
+}
