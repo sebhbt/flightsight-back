@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.sbthbt.flightsight_back.db.entity.ReviewEntity;
 
 public interface ReviewRepository extends JpaRepository<ReviewEntity, Long>, JpaSpecificationExecutor<ReviewEntity> {
-    List<ReviewEntity> findByFlightId(Long flightId);
+    List<ReviewEntity> findByFlightFlightId(Long flightId);
 }

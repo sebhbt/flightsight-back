@@ -29,7 +29,7 @@ public class ReviewService {
     }
 
     public List<ReviewEntity> getReviewsByFlightId(Long flightId) {
-        return reviewRepository.findByFlightId(flightId);
+        return reviewRepository.findByFlightFlightId(flightId);
     }
 
     public ReviewEntity updateReview(Long id, ReviewEntity reviewDetails) {

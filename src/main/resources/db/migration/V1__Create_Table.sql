@@ -12,9 +12,11 @@ CREATE TABLE flights (
 );
 
 -- Index for table flights
-CREATE INDEX idx_flights_airline ON flights(airline);
-CREATE INDEX idx_flights_departure_datetime ON flights(departure_datetime);
 CREATE INDEX idx_flights_flight_number ON flights(flight_number);
+CREATE INDEX idx_flights_airline ON flights(airline);
+CREATE INDEX idx_flights_departure_airport ON flights(departure_airport);
+CREATE INDEX idx_flights_arrival_airport ON flights(arrival_airport);
+CREATE INDEX idx_flights_departure_datetime ON flights(departure_datetime);
 
 
 -- Table customers
@@ -40,6 +42,7 @@ CREATE TABLE reviews (
     comment TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'UNPROCESSED' CHECK (status IN ('UNPROCESSED', 'PROCESSED', 'PUBLISHED', 'REJECTED')),
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
     FOREIGN KEY (flight_id) REFERENCES flights(flight_id)
 );
@@ -47,8 +50,9 @@ CREATE TABLE reviews (
 -- Index for table reviews
 CREATE INDEX idx_reviews_rating ON reviews(rating);
 CREATE INDEX idx_reviews_create_at ON reviews(created_at);
-CREATE INDEX idx_reviews_flight_id ON reviews(flight_id);
+CREATE INDEX idx_reviews_status ON reviews(status);
 CREATE INDEX idx_reviews_customer_id ON reviews(customer_id);
+CREATE INDEX idx_reviews_flight_id ON reviews(flight_id);
 
 -- Table responses
 CREATE TABLE responses (
@@ -56,11 +60,9 @@ CREATE TABLE responses (
     review_id BIGINT NOT NULL,
     response_text TEXT NOT NULL,
     response_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'published')),
     FOREIGN KEY (review_id) REFERENCES reviews(review_id)
 );
 
 -- Index for table responses
 CREATE INDEX idx_responses_review_id ON responses(review_id);
-CREATE INDEX idx_responses_status ON responses(status);
 CREATE INDEX idx_responses_response_date ON responses(response_date);

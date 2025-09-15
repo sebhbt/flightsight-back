@@ -7,7 +7,6 @@ import com.sbthbt.flightsight_back.db.entity.ResponseReviewEntity;
 import com.sbthbt.flightsight_back.db.entity.ReviewEntity;
 
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
@@ -18,21 +17,27 @@ public class ReviewSpecification {
         return (root, query, criteriaBuilder) -> {
 
             if (criteria == null || isAllCriteriaNull(criteria)) {
-                return criteriaBuilder.conjunction(); // Retourne une condition vide (tout est inclus)
+                return criteriaBuilder.conjunction();
             }
 
             Predicate predicate = criteriaBuilder.conjunction();
 
             if (criteria.getFlightId() != null) {
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(root.get("flightId"), criteria.getFlightId()));
+                        criteriaBuilder.equal(root.get("flight").get("flightId"), criteria.getFlightId()));
             }
 
             if (criteria.getAirlineName() != null) {
-                Join<ReviewEntity, FlightEntity> flightJoin = root.join("flightId", JoinType.LEFT); // Jointure avec la
-                                                                                                    // table Flight
+                Join<ReviewEntity, FlightEntity> flightJoin = root.join("flight");
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(flightJoin.get("airline"), criteria.getAirlineName()));
+                        criteriaBuilder.like(
+                                criteriaBuilder.lower(flightJoin.get("airline")),
+                                "%" + criteria.getAirlineName().toLowerCase() + "%"));
+            }
+
+            if (criteria.getStatus() != null) {
+                predicate = criteriaBuilder.and(predicate,
+                        criteriaBuilder.equal(root.get("status"), criteria.getStatus()));
             }
 
             if (criteria.getCreatedFrom() != null) {

@@ -1,6 +1,5 @@
 package com.sbthbt.flightsight_back.controller;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -21,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sbthbt.flightsight_back.db.entity.ReviewEntity;
+import com.sbthbt.flightsight_back.db.repository.FlightRepository;
 import com.sbthbt.flightsight_back.dto.ReviewDto;
+import com.sbthbt.flightsight_back.dto.ReviewMapper;
 import com.sbthbt.flightsight_back.services.ReviewService;
 import com.sbthbt.flightsight_back.specification.ReviewSearchCriteria;
 
@@ -38,45 +39,39 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+    @Autowired
+    private FlightRepository flightRepository;
+
     @PostMapping
     @Operation(summary = "Create a new review", description = "Creates a new review for a flight")
     @ApiResponse(responseCode = "201", description = "Review created successfully")
-    public ResponseEntity<ReviewEntity> createReview(@RequestBody ReviewDto reviewDto) {
+    public ResponseEntity<ReviewDto> createReview(@RequestBody ReviewDto reviewDto) {
         ReviewEntity review = new ReviewEntity();
         review.setCustomerId((long) 1);
-        review.setFlightId(reviewDto.getFlightId());
+        review.setFlight(flightRepository.getReferenceById(reviewDto.getFlightId()));
         review.setTitle(reviewDto.getTitle());
         review.setComment(reviewDto.getComment());
         review.setRating(reviewDto.getRating());
         ReviewEntity createdReview = reviewService.createReview(review);
-        return ResponseEntity.status(201).body(createdReview);
+        return ResponseEntity.status(201).body(ReviewMapper.toDTO(createdReview));
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Get a review by ID", description = "Returns a review by its ID")
     @ApiResponse(responseCode = "200", description = "Review found")
     @ApiResponse(responseCode = "404", description = "Review not found")
-    public ResponseEntity<ReviewEntity> getReviewById(
+    public ResponseEntity<ReviewDto> getReviewById(
             @Parameter(description = "ID of the review") @PathVariable Long id) {
         Optional<ReviewEntity> review = reviewService.getReviewById(id);
-        return review.map(ResponseEntity::ok)
+        return review.map(ReviewMapper::toDTO).map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/flight/{flightId}")
-    @Operation(summary = "Get reviews by flight ID", description = "Returns all reviews for a specific flight")
-    @ApiResponse(responseCode = "200", description = "List of reviews for the flight")
-    public ResponseEntity<List<ReviewEntity>> getReviewsByFlightId(
-            @Parameter(description = "ID of the flight") @PathVariable Long flightId) {
-        List<ReviewEntity> reviews = reviewService.getReviewsByFlightId(flightId);
-        return ResponseEntity.ok(reviews);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update a review", description = "Updates an existing review")
     @ApiResponse(responseCode = "200", description = "Review updated successfully")
     @ApiResponse(responseCode = "404", description = "Review not found")
-    public ResponseEntity<ReviewEntity> updateReview(
+    public ResponseEntity<ReviewDto> updateReview(
             @Parameter(description = "ID of the review to update") @PathVariable Long id,
             @RequestBody ReviewDto reviewDto) {
         ReviewEntity reviewDetails = new ReviewEntity();
@@ -84,7 +79,7 @@ public class ReviewController {
         reviewDetails.setComment(reviewDto.getComment());
         reviewDetails.setRating(reviewDto.getRating());
         ReviewEntity updatedReview = reviewService.updateReview(id, reviewDetails);
-        return ResponseEntity.ok(updatedReview);
+        return ResponseEntity.ok(ReviewMapper.toDTO(updatedReview));
     }
 
     @DeleteMapping("/{id}")
@@ -103,9 +98,10 @@ public class ReviewController {
                 Default pagination: 20 items per page.
             """)
     @ApiResponse(responseCode = "200", description = "Paginated list of reviews matching the criteria")
-    public Page<ReviewEntity> searchReviews(
+    public Page<ReviewDto> searchReviews(
             @Parameter(description = "Search criteria for reviews (optional)") @ModelAttribute ReviewSearchCriteria criteria,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC, size = 20) Pageable pageable) {
-        return reviewService.searchReviews(criteria, pageable);
+        Page<ReviewEntity> reviews = reviewService.searchReviews(criteria, pageable);
+        return reviews.map(ReviewMapper::toDTO);
     }
 }

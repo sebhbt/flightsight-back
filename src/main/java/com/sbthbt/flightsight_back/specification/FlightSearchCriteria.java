@@ -24,7 +24,6 @@ public class FlightSearchCriteria {
     @Schema(description = "End date for departure (UTC)", example = "2025-09-30T23:59:59")
     private LocalDateTime departureTo;
 
-    // Getters and setters
     public String getFlightNumber() {
         return flightNumber;
     }

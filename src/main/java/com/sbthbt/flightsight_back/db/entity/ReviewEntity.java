@@ -3,13 +3,20 @@ package com.sbthbt.flightsight_back.db.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sbthbt.flightsight_back.db.ReviewStatus;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
@@ -29,9 +36,10 @@ public class ReviewEntity {
     @Schema(description = "ID of the customer who wrote the review", example = "1")
     private Long customerId;
 
-    @Column(name = "flight_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "flight_id")
     @Schema(description = "ID of the flight being reviewed", example = "1")
-    private Long flightId;
+    private FlightEntity flight;
 
     @Column(nullable = false)
     @Schema(description = "Review title", example = "Great flight!")
@@ -42,8 +50,13 @@ public class ReviewEntity {
     private String comment;
 
     @Column(nullable = false)
-    @Schema(description = "Rating from 1 to 5", example = "5")
+    @Schema(description = "Rating from 1 to 10", example = "5")
     private Integer rating;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @Schema(description = "Status of the review", example = "processed")
+    private ReviewStatus status;
 
     @Column(nullable = false, updatable = false)
     @Schema(description = "Creation timestamp of the review", example = "2025-09-13T10:00:00")
@@ -60,6 +73,7 @@ public class ReviewEntity {
     @PrePersist
     protected void onCreate() {
         createdAt = LocalDateTime.now();
+        this.status = ReviewStatus.UNPROCESSED;
     }
 
     @PreUpdate
@@ -67,7 +81,6 @@ public class ReviewEntity {
         updatedAt = LocalDateTime.now();
     }
 
-    // Getters and setters
     public Long getReviewId() {
         return reviewId;
     }
@@ -84,12 +97,12 @@ public class ReviewEntity {
         this.customerId = customerId;
     }
 
-    public Long getFlightId() {
-        return flightId;
+    public FlightEntity getFlight() {
+        return flight;
     }
 
-    public void setFlightId(Long flightId) {
-        this.flightId = flightId;
+    public void setFlight(FlightEntity flight) {
+        this.flight = flight;
     }
 
     public String getTitle() {
@@ -114,6 +127,14 @@ public class ReviewEntity {
 
     public void setRating(Integer rating) {
         this.rating = rating;
+    }
+
+    public ReviewStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReviewStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedAt() {

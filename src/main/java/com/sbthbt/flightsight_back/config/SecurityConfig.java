@@ -2,7 +2,6 @@ package com.sbthbt.flightsight_back.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -20,8 +19,8 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // Public Access
-                        .anyRequest().permitAll() // All request are authorized
+                        .requestMatchers("/api/**").permitAll()
+                        .anyRequest().permitAll()
 
                 )
                 .httpBasic(basic -> basic.init(http));

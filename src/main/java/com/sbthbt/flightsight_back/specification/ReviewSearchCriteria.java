@@ -2,6 +2,8 @@ package com.sbthbt.flightsight_back.specification;
 
 import java.time.LocalDateTime;
 
+import com.sbthbt.flightsight_back.db.ReviewStatus;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Criteria for searching reviews")
@@ -10,8 +12,11 @@ public class ReviewSearchCriteria {
     @Schema(description = "ID of the flight", example = "1")
     private Long flightId;
 
-    @Schema(description = "Name of the airline", example = "Air France")
+    @Schema(description = "Name of the airline", example = "AFR")
     private String airlineName;
+
+    @Schema(description = "Status of the review", example = "UNPROCESSED")
+    private ReviewStatus status;
 
     @Schema(description = "Start date for review creation", example = "2025-09-01T00:00:00")
     private LocalDateTime createdFrom;
@@ -22,7 +27,6 @@ public class ReviewSearchCriteria {
     @Schema(description = "Filter by reviews with at least one response", example = "true")
     private Boolean hasResponse;
 
-    // Getters and setters
     public Long getFlightId() {
         return flightId;
     }
@@ -37,6 +41,14 @@ public class ReviewSearchCriteria {
 
     public void setAirlineName(String airlineName) {
         this.airlineName = airlineName;
+    }
+
+    public ReviewStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ReviewStatus status) {
+        this.status = status;
     }
 
     public LocalDateTime getCreatedFrom() {

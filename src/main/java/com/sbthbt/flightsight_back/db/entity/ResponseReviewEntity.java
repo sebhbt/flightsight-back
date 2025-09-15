@@ -2,12 +2,8 @@ package com.sbthbt.flightsight_back.db.entity;
 
 import java.time.LocalDateTime;
 
-import com.sbthbt.flightsight_back.db.ResponseStatus;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,17 +30,10 @@ public class ResponseReviewEntity {
     @Column(name = "response_date", nullable = false)
     private LocalDateTime responseDate;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private ResponseStatus status; // draft, published
-
-    // Constructeurs, getters et setters
     public ResponseReviewEntity() {
         this.responseDate = LocalDateTime.now();
-        this.status = ResponseStatus.DRAFT;
     }
 
-    // Getters et setters pour chaque champ
     public Long getResponseId() {
         return responseId;
     }
@@ -75,13 +64,5 @@ public class ResponseReviewEntity {
 
     public void setResponseDate(LocalDateTime responseDate) {
         this.responseDate = responseDate;
-    }
-
-    public ResponseStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ResponseStatus status) {
-        this.status = status;
     }
 }

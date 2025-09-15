@@ -24,13 +24,10 @@ public class FlightService {
     }
 
     public Page<FlightEntity> searchFlights(FlightSearchCriteria criteria, Pageable pageable) {
-        // Si le criteria est null ou vide, retourner les 20 derniers vols par date de
-        // départ
         if (criteria == null || isCriteriaEmpty(criteria)) {
             return flightRepository.findAll(pageable);
         }
 
-        // Sinon, appliquer les critères de recherche
         Specification<FlightEntity> spec = FlightSpecification.withCriteria(criteria);
         return flightRepository.findAll(spec, pageable);
     }
