@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -32,9 +33,12 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import reactor.core.publisher.Mono;
 
 @RestController
+@RequestMapping("/api")
+@Tag(name = "Flights", description = "API for managing flights")
 public class FlightController {
 
     @Autowired
@@ -102,13 +106,13 @@ public class FlightController {
                         Search criteria for flights.
                         If empty, the 20 most recent flights by departure date are returned.
                     """) @ModelAttribute FlightSearchCriteria criteria,
-            @ParameterObject @PageableDefault(size = 20, sort = "departureDatetime", direction = Sort.Direction.ASC) Pageable pageable) {
+            @ParameterObject @PageableDefault(size = 20, sort = "departureDatetime", direction = Sort.Direction.DESC) Pageable pageable) {
         return flightService.searchFlights(criteria, pageable);
     }
 
     private FlightEntity toFlightEntity(OpenSkyFlightDto dto) {
         FlightEntity flight = new FlightEntity();
-        flight.setFlightNumber(dto.getCallsign());
+        flight.setFlightNumber(dto.getCallsign().trim());
         flight.setAirline(extractAirlineFromCallsign(dto.getCallsign())); // Exemple : "AFR123" -> "Air France"
         flight.setDepartureDatetime(
                 Instant.ofEpochSecond(dto.getFirstSeen()).atZone(ZoneId.of("UTC")).toLocalDateTime());
@@ -136,7 +140,7 @@ public class FlightController {
     }
 
     private long getBeginTimestamp() {
-        return Instant.now().minus(3, ChronoUnit.HOURS).getEpochSecond();
+        return Instant.now().minus(2, ChronoUnit.HOURS).getEpochSecond();
     }
 
     private long getEndTimestamp() {

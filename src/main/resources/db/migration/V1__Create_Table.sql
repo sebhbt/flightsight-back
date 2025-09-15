@@ -35,7 +35,7 @@ CREATE TABLE reviews (
     review_id BIGSERIAL PRIMARY KEY,
     customer_id BIGINT NOT NULL,
     flight_id BIGINT NOT NULL,
-    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 10),
     title TEXT NOT NULL,
     comment TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

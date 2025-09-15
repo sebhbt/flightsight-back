@@ -8,5 +8,4 @@ import com.sbthbt.flightsight_back.db.entity.FlightEntity;
 
 @Repository
 public interface FlightRepository extends JpaRepository<FlightEntity, Long>, JpaSpecificationExecutor<FlightEntity> {
-    // Page<FlightEntity> findAll(Pageable pageable);
 }

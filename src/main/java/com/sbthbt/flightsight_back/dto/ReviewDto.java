@@ -12,7 +12,7 @@ public class ReviewDto {
     private String title;
 
     @Schema(description = "Review content", example = "The flight was comfortable and on time.", required = true)
-    private String content;
+    private String comment;
 
     @Schema(description = "Rating from 1 to 5", example = "5", required = true)
     private Integer rating;
@@ -34,12 +34,12 @@ public class ReviewDto {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
+    public String getComment() {
+        return comment;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setComment(String content) {
+        this.comment = content;
     }
 
     public Integer getRating() {

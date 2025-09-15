@@ -14,22 +14,26 @@ public class FlightSpecification {
 
             if (criteria.getFlightNumber() != null) {
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(root.get("flightNumber"), criteria.getFlightNumber()));
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("flightNumber")),
+                                "%" + criteria.getFlightNumber().toLowerCase() + "%"));
             }
 
             if (criteria.getAirline() != null) {
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(root.get("airline"), criteria.getAirline()));
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("airline")),
+                                "%" + criteria.getAirline().toLowerCase() + "%"));
             }
 
             if (criteria.getDepartureAirport() != null) {
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(root.get("departureAirport"), criteria.getDepartureAirport()));
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("departureAirport")),
+                                "%" + criteria.getDepartureAirport().toLowerCase() + "%"));
             }
 
             if (criteria.getArrivalAirport() != null) {
                 predicate = criteriaBuilder.and(predicate,
-                        criteriaBuilder.equal(root.get("arrivalAirport"), criteria.getArrivalAirport()));
+                        criteriaBuilder.like(criteriaBuilder.lower(root.get("arrivalAirport")),
+                                "%" + criteria.getArrivalAirport().toLowerCase() + "%"));
             }
 
             if (criteria.getDepartureFrom() != null) {

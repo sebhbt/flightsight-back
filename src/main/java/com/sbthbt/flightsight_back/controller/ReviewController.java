@@ -43,9 +43,10 @@ public class ReviewController {
     @ApiResponse(responseCode = "201", description = "Review created successfully")
     public ResponseEntity<ReviewEntity> createReview(@RequestBody ReviewDto reviewDto) {
         ReviewEntity review = new ReviewEntity();
+        review.setCustomerId((long) 1);
         review.setFlightId(reviewDto.getFlightId());
         review.setTitle(reviewDto.getTitle());
-        review.setComment(reviewDto.getContent());
+        review.setComment(reviewDto.getComment());
         review.setRating(reviewDto.getRating());
         ReviewEntity createdReview = reviewService.createReview(review);
         return ResponseEntity.status(201).body(createdReview);
@@ -80,7 +81,7 @@ public class ReviewController {
             @RequestBody ReviewDto reviewDto) {
         ReviewEntity reviewDetails = new ReviewEntity();
         reviewDetails.setTitle(reviewDto.getTitle());
-        reviewDetails.setComment(reviewDto.getContent());
+        reviewDetails.setComment(reviewDto.getComment());
         reviewDetails.setRating(reviewDto.getRating());
         ReviewEntity updatedReview = reviewService.updateReview(id, reviewDetails);
         return ResponseEntity.ok(updatedReview);
