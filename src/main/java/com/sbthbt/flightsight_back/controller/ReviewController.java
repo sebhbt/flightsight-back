@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sbthbt.flightsight_back.db.entity.ReviewEntity;
-import com.sbthbt.flightsight_back.db.repository.FlightRepository;
 import com.sbthbt.flightsight_back.dto.ReviewDto;
 import com.sbthbt.flightsight_back.dto.ReviewMapper;
+import com.sbthbt.flightsight_back.services.FlightService;
 import com.sbthbt.flightsight_back.services.ReviewService;
 import com.sbthbt.flightsight_back.specification.ReviewSearchCriteria;
 
@@ -40,15 +40,18 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @Autowired
-    private FlightRepository flightRepository;
+    private FlightService flightService;
 
     @PostMapping
     @Operation(summary = "Create a new review", description = "Creates a new review for a flight")
     @ApiResponse(responseCode = "201", description = "Review created successfully")
     public ResponseEntity<ReviewDto> createReview(@RequestBody ReviewDto reviewDto) {
         ReviewEntity review = new ReviewEntity();
+        if (flightService.getFlightById(reviewDto.getFlightId()).isEmpty()) {
+            return ResponseEntity.status(404).body(null);
+        }
         review.setCustomerId((long) 1);
-        review.setFlight(flightRepository.getReferenceById(reviewDto.getFlightId()));
+        review.setFlight(flightService.getFlightById(reviewDto.getFlightId()).get());
         review.setTitle(reviewDto.getTitle());
         review.setComment(reviewDto.getComment());
         review.setRating(reviewDto.getRating());
