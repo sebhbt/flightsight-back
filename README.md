@@ -174,3 +174,16 @@ mvn clean install
 ```
 
 This will compile your project and store the build jar in the `target/` directory.
+
+## AI Assistance in Development
+
+For this Spring Boot project, I used **AI tools** to:
+
+## AI Assistance in Spring Boot Development
+
+For this Spring Boot project, I utilized AI tools to:
+- **Generate JPA entities**
+- **Help with SQL syntax** 
+- **Configure project setup**
+- **Troubleshoot issues**
+- **Understand framework mechanics**
